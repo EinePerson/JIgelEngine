@@ -2,6 +2,7 @@ package de.igelstudios.jigelengine.client;
 
 import de.igelstudios.jigelengine.client.keys.HIDInput;
 import de.igelstudios.jigelengine.client.rendering.Renderer;
+import de.igelstudios.jigelengine.client.rendering.data.ModelCache;
 import de.igelstudios.jigelengine.common.engine.Engine;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -51,7 +52,7 @@ public class ClientEngine extends Engine {
 
     @Override
     public void loop() {
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT  | GL11.GL_DEPTH_BUFFER_BIT);
         renderer.render();
         GLFW.glfwSwapBuffers(window.getWindow());
         window.pollEvents();
@@ -60,6 +61,7 @@ public class ClientEngine extends Engine {
 
     @Override
     public void second() {
+        Client.LOGGER.info("FPS:" + fps);
         fps = 0;
     }
 
@@ -68,23 +70,8 @@ public class ClientEngine extends Engine {
         //this.initializer.onEnd();
         this.window.close();
         this.input.close();
+        ModelCache.delete();
     }
-
-    /*public ClientScene getScene() {
-        return scene;
-    }*/
-
-    /*public void setScene(ClientScene scene) {
-        this.scene = scene;
-    }*/
-
-    /*public Window getWindow() {
-        return window;
-    }*/
-
-    /*public HIDInput getInput() {
-        return input;
-    }*/
 
     public int getFPS() {
         return fps;

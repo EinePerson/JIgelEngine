@@ -1,10 +1,15 @@
 package de.igelstudios.jigelengine.client;
 
+import de.igelstudios.jigelengine.client.rendering.data.DataLoader;
+import de.igelstudios.jigelengine.client.rendering.data.Texture;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.openal.*;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 
@@ -50,13 +55,13 @@ public class Window {
         else glfwSetWindowPos(window,0,0);
 
         glfwRequestWindowAttention(window);
-        /*try(MemoryStack stack = MemoryStack.stackPush()) {
+        try(MemoryStack stack = MemoryStack.stackPush()) {
             Texture.TextureInfo info = new Texture.TextureInfo();
-            ByteBuffer img = Texture.read("Icon.png",info);
+            ByteBuffer img = DataLoader.loadImage("Icon.png",info);
             GLFWImage glfwImg = GLFWImage.malloc();
             glfwImg.set(info.ip0().get(),info.ip1().get(),img);
             glfwSetWindowIcon(window, GLFWImage.calloc(1,stack).put(0,glfwImg));
-        }*/
+        }
         glfwSetWindowSizeLimits(window, width, height, width, height);
         glfwSetFramebufferSizeCallback(window, ((handle1, width1, height1) -> resize(width1,height1)));
 

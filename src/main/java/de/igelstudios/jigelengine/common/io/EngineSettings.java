@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
 
+/**
+ * This class is used to decode a Json file which contains the full names of classes used for Anything Engine related
+ */
 public class EngineSettings {
     private String main;
     private String server_main;

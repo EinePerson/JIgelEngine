@@ -22,7 +22,7 @@ public class GUIManager implements KeyListener, MouseMoveListener {
         if(!pressed)return;
         if(gui == null)return;
         /*gui.getButtons().forEach(button -> {
-            if(button.getPos().x <= x && button.getPos().x + button.getSize().x > x && button.getPos().y <= y && button.getPos().y + button.getSize().y > y){
+            if(button.getPosition().x <= x && button.getPosition().x + button.getSize().x > x && button.getPosition().y <= y && button.getPosition().y + button.getSize().y > y){
                 button.invoke(MouseButton.LMB);
             }
         });
@@ -30,7 +30,7 @@ public class GUIManager implements KeyListener, MouseMoveListener {
         boolean set = false;
         for (int i = 0; i < gui.getTextFields().size(); i++) {
             TextField field = gui.getTextFields().get(i);
-            if(field.getPos().x <= x && field.getPos().x + field.getSize().x > x && field.getPos().y <= y && field.getPos().y + field.getSize().y > y){
+            if(field.getPosition().x <= x && field.getPosition().x + field.getSize().x > x && field.getPosition().y <= y && field.getPosition().y + field.getSize().y > y){
                 selText = i;
                 set = true;
                 break;
@@ -44,7 +44,7 @@ public class GUIManager implements KeyListener, MouseMoveListener {
         /*if(!pressed)return;
         if(gui == null)return;
         gui.getButtons().forEach(button -> {
-            if(button.getPos().x <= x && button.getPos().x + button.getSize().x > x && button.getPos().y <= y && button.getPos().y + button.getSize().y > y){
+            if(button.getPosition().x <= x && button.getPosition().x + button.getSize().x > x && button.getPosition().y <= y && button.getPosition().y + button.getSize().y > y){
                 button.invoke(MouseButton.RMB);
             }
         });*/
@@ -55,7 +55,7 @@ public class GUIManager implements KeyListener, MouseMoveListener {
         /*if(!pressed)return;
         if(gui == null)return;
         gui.getButtons().forEach(button -> {
-            if(button.getPos().x <= x && button.getPos().x + button.getSize().x > x && button.getPos().y <= y && button.getPos().y + button.getSize().y > y){
+            if(button.getPosition().x <= x && button.getPosition().x + button.getSize().x > x && button.getPosition().y <= y && button.getPosition().y + button.getSize().y > y){
                 button.invoke(MouseButton.MMB);
             }
         });*/

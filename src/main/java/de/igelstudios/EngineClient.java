@@ -7,6 +7,7 @@ public class EngineClient {
 
     public static void main(String[] args) {
         EngineClient.client = new Client();
+        client.init();
         client.start();
     }
 

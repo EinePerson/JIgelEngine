@@ -1,6 +1,10 @@
 package de.igelstudios.jigelengine.common.init;
 
 public interface ClientInitializer {
+    /**
+     * This method is called during the Initialization of the {@link de.igelstudios.jigelengine.client.keys.HIDInput}
+     * @param paramKeyInitializer the object where keys and Key Listeners can be added
+     */
     void registerKeys(KeyInitializer paramKeyInitializer);
 
     /**
@@ -13,5 +17,8 @@ public interface ClientInitializer {
      */
     void onInitialize();
 
+    /**
+     * This is the last thing executed in the Program
+     */
     void onEnd();
 }

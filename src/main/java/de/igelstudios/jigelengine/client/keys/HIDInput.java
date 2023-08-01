@@ -1,6 +1,7 @@
 package de.igelstudios.jigelengine.client.keys;
 
 import de.igelstudios.EngineClient;
+import de.igelstudios.jigelengine.client.Client;
 import de.igelstudios.jigelengine.client.gui.GUIManager;
 import de.igelstudios.jigelengine.common.init.ClientInitializer;
 import de.igelstudios.jigelengine.common.init.KeyInitializer;
@@ -189,20 +190,15 @@ public class HIDInput {
         mousePos = new GLFWCursorPosCallback() {
             @Override
             public void invoke(long window, double xPos, double yPos) {
-                xPos /= EngineClient.getClient().getWindow().getWidth();
-                yPos = EngineClient.getClient().getWindow().getHeight() / 2.0f - yPos + (EngineClient.getClient().getWindow().getHeight() / 2.0f);
-                yPos /= EngineClient.getClient().getWindow().getHeight();
-                double finalXPos = EngineClient.getClient().getWindow().getWidth();//xPos * Camera.getX();
-                double finalYPos = EngineClient.getClient().getWindow().getHeight();//yPos * Camera.getY();
-                dragListeners.forEach((name, map) -> map.forEach(((method, listener) -> {
+                dragListeners.forEach((name,map) -> map.forEach(((method, listener) -> {
                     try {
                         if(keys[keyConfig.get(name)])
-                            method.invoke(listener, finalXPos - mouseX, finalYPos - mouseY, finalXPos, finalYPos);
+                            method.invoke(listener,xPos - mouseX,yPos - mouseY,xPos,yPos);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
                 })));
-                mouseMove.forEach(listeners -> listeners.mouseMove(finalXPos,finalYPos));
+                mouseMove.forEach(listeners -> listeners.mouseMove(xPos,yPos));
                 mouseX = xPos;
                 mouseY = yPos;
             }
