@@ -26,8 +26,8 @@ jobs:
       - name: Set Up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          version: '17'
-          java-version: '17'
+          version: '17.0.8'
+          java-version: '17.0.8'
 
       - name: Build Native Image
         run: |
