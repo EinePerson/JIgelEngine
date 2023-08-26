@@ -1,0 +1,38 @@
+name: Build Release Artifacts
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build:
+    name: Build Native Images
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '20'
+
+      - name: Set Up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          graalvm-version: '20.0.1' # Replace with your desired GraalVM version
+          java-version: '20'
+
+      - name: Build Native Image
+        run: |
+          ./gradlew nativeImage
+          
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}-artifacts
+          path: build/libs/
