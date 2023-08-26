@@ -70,7 +70,7 @@ public class Camera {
         recalculate();
     }
 
-    private void recalculate() {
+    public void recalculate() {
         viewMatrix.identity().rotateX(rotation.x).rotateY(rotation.y).translate(-position.x, -position.y, -position.z);
         dirty = true;
     }
@@ -101,6 +101,10 @@ public class Camera {
     }
 
     public Vector3f getPosition() {
-        return new Vector3f(position.x,position.y,position.z);
+        return position;
+    }
+
+    public Vector3f getDirection() {
+        return direction;
     }
 }

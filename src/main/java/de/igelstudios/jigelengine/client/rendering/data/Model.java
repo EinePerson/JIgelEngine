@@ -16,6 +16,10 @@ public class Model {
         texture.delete();
     }
 
+    public boolean isTransparent(){
+        return texture.isTransparent();
+    }
+
     public Mesh getMesh() {
         return mesh;
     }

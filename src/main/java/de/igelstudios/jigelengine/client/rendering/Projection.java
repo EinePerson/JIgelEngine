@@ -1,4 +1,4 @@
-package de.igelstudios.jigelengine.client;
+package de.igelstudios.jigelengine.client.rendering;
 
 import org.joml.Matrix4f;
 

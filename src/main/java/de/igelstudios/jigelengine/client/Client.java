@@ -1,7 +1,12 @@
 package de.igelstudios.jigelengine.client;
 
 import de.igelstudios.jigelengine.client.keys.HIDInput;
-import de.igelstudios.jigelengine.client.rendering.Renderer;
+import de.igelstudios.jigelengine.client.rendering.ObjectRenderer;
+import de.igelstudios.jigelengine.client.rendering.data.DataLoader;
+import de.igelstudios.jigelengine.client.rendering.shader.Shader;
+import de.igelstudios.jigelengine.client.rendering.shader.ShaderData;
+import de.igelstudios.jigelengine.client.rendering.terrain.Terrain;
+import de.igelstudios.jigelengine.client.rendering.terrain.TerrainRenderer;
 import de.igelstudios.jigelengine.common.engine.EngineNotifier;
 import de.igelstudios.jigelengine.common.init.ClientInitializer;
 import de.igelstudios.jigelengine.common.io.EngineSettings;
@@ -10,12 +15,6 @@ import de.igelstudios.jigelengine.common.scene.Scene;
 import de.igelstudios.jigelengine.common.util.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
 
 public class Client implements EngineNotifier {
 
@@ -26,10 +25,13 @@ public class Client implements EngineNotifier {
     private HIDInput input;
     private ClientInitializer initializer;
 
-    private Renderer renderer;
+    private ObjectRenderer renderer;
     private EngineSettings defaultSet;
     private Scene scene;
     private Camera camera;
+    private TerrainRenderer terrainRenderer;
+    @Test
+    private Terrain terrain;
     public Client() {
         defaultSet = EngineSettings.parser("info.json").read();
         try {
@@ -48,9 +50,14 @@ public class Client implements EngineNotifier {
         input.registerGLFWListeners(window.getWindow());
         scene = new Scene();
         camera = new Camera();
-        renderer = new Renderer(scene,camera);
+        terrain = new Terrain(0,0,DataLoader.loadTexture("blendMap.png"),DataLoader.loadTexture("grass2.png"),DataLoader.loadTexture("grassFlowers.png"),DataLoader.loadTexture("mud.png"),
+                DataLoader.loadTexture("path.png"));
+        System.out.println(DataLoader.loadTexture("grass.png").isTransparent());
+        renderer = new ObjectRenderer(scene,camera);
         renderer.resize(window.getWidth(), window.getHeight());
-        engine = new ClientEngine(window, input, renderer, defaultSet.getTPS());
+        terrainRenderer = new TerrainRenderer(terrain,scene,camera);
+        terrainRenderer.resize(window.getWidth(),window.getHeight());
+        engine = new ClientEngine(window, input,defaultSet.getTPS(),renderer,terrainRenderer);
         engine.addNotifiable(this);
         scene.init();
         camera.init();
@@ -87,6 +94,8 @@ public class Client implements EngineNotifier {
     @Override
     public void stop() {
         renderer.delete();
+        terrainRenderer.delete();
+        scene.delete();
         this.initializer.onEnd();
     }
 

@@ -1,6 +1,7 @@
 package de.igelstudios.jigelengine.common.scene;
 
 import de.igelstudios.jigelengine.client.rendering.data.Model;
+import de.igelstudios.jigelengine.client.rendering.data.RenderCache;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -18,8 +19,8 @@ public class SceneObject {
     /**
      * This constructs a new 3D renderer object with the given values
      * @param pos the position of the Object, this will always be the same
-     * @param model the model of the Object obtainable with: <br> {@link de.igelstudios.jigelengine.client.rendering.data.ModelCache#get(String)}
-     *              <br> {@link de.igelstudios.jigelengine.client.rendering.data.ModelCache#load(String, String, String)}
+     * @param model the model of the Object obtainable with: <br> {@link RenderCache#get(String)}
+     *              <br> {@link RenderCache#load(String, String, String)}
      * @see SceneObject#SceneObject(Model)  SceneObject
      */
     public SceneObject(Vector3f pos,Model model){
@@ -33,8 +34,8 @@ public class SceneObject {
 
     /**
      * This constructs a new 3D renderer object with the given Model and position at 0,0,0
-     * @param model the model of the Object obtainable with: <br> {@link de.igelstudios.jigelengine.client.rendering.data.ModelCache#get(String)}
-     *              <br> {@link de.igelstudios.jigelengine.client.rendering.data.ModelCache#load(String, String, String)}
+     * @param model the model of the Object obtainable with: <br> {@link RenderCache#get(String)}
+     *              <br> {@link RenderCache#load(String, String, String)}
      * @see SceneObject#SceneObject(Vector3f, Model)  SceneObject
      */
     public SceneObject(Model model){

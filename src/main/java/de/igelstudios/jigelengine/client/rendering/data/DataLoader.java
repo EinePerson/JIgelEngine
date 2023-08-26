@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,8 +22,7 @@ import static org.lwjgl.assimp.Assimp.*;
 import static org.lwjgl.assimp.Assimp.aiProcess_PreTransformVertices;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 
@@ -34,26 +34,6 @@ public class DataLoader {
     }
 
     private static Model loadModel(String id, String modelPath, String texPath, int i) {
-        /*try (InputStream stream = DataLoader.class.getClassLoader().getResourceAsStream(modelPath)){
-            if(stream == null)throw new IllegalArgumentException("The model " + modelPath + " could not be found");
-            byte[] b = stream.readAllBytes();
-            ByteBuffer bp = BufferUtils.createByteBuffer(b.length);
-            bp.put(b);
-            bp.flip();
-            AIScene scene = aiImportFileFromMemory(bp,i, (ByteBuffer) null);
-            if (scene == null) throw new RuntimeException("Could not load model" + modelPath + " and " + texPath);
-
-            PointerBuffer pp = scene.mMeshes();
-            AIMesh mesh = AIMesh.create(pp.get(0));
-            float[] vertices = Numbers.toFArr(processVertices(mesh));
-            float[] tex = Numbers.toFArr(processTexCoords(mesh));
-            int[] indecies = Numbers.toIArr(processIndicies(mesh));
-
-            aiReleaseImport(scene);
-            return new Model(id, loadVAO(vertices, tex, indecies), new Texture(texPath, 0));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }*/
         return new Model(id,loadMesh(modelPath,i),loadTexture(texPath));
     }
 
@@ -71,16 +51,17 @@ public class DataLoader {
             AIMesh mesh = AIMesh.create(pp.get(0));
             float[] vertices = Numbers.toFArr(processVertices(mesh));
             float[] tex = Numbers.toFArr(processTexCoords(mesh));
+            float[] normals = Numbers.toFArr(processNormals(mesh));
             int[] indecies = Numbers.toIArr(processIndicies(mesh));
 
             aiReleaseImport(scene);
-            return loadVAO(vertices, tex, indecies);
+            return loadVAO(vertices, tex,normals, indecies);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Texture loadTexture(String path){
+    public static Texture loadTexture(String path){
         int tex = glGenTextures();
         GL40.glBindTexture(GL11.GL_TEXTURE_2D, tex);
         GL40.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
@@ -90,13 +71,19 @@ public class DataLoader {
         Texture.TextureInfo info = new Texture.TextureInfo();
         ByteBuffer img = loadImage(path,info);
         if (img != null){
-            if(info.ip2().get(0) == 3) GL40.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, info.ip0().get(0), info.ip1().get(0), 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, img);
-            else if(info.ip2().get(0) == 4)GL40.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, info.ip0().get(0), info.ip1().get(0), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, img);
+            //if(info.ip2().get(0) == 3) GL40.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, info.ip0().get(0), info.ip1().get(0), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, img);
+            //else if(info.ip2().get(0) == 4)
+            GL40.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, info.ip0().get(0), info.ip1().get(0), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, img);
             stbi_image_free(img);
         }
         else throw new IllegalArgumentException("Could not load image:" + path);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_LOD_BIAS,-1.0f);
 
-        return new Texture(path,tex);
+        Texture texture = new Texture(path,tex);
+        texture.setTransparent(info.ip2().get(0) >= 4);
+        return texture;
     }
 
     public static ByteBuffer loadImage(String name, Texture.TextureInfo info){
@@ -111,6 +98,17 @@ public class DataLoader {
         }catch (IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    private static boolean isTransparent(ByteBuffer bp) {
+        boolean transp = false;
+        for (int i = 0; i < bp.capacity(); i += 4) {
+            if((0xFF & bp.get(i + 3)) < 255){
+                transp = true;
+                break;
+            }
+        }
+        return transp;
     }
 
     private static int store(int i,int j,float[] f){
@@ -129,13 +127,15 @@ public class DataLoader {
         return vbo;
     }
 
-    private static Mesh loadVAO(float[] pos, float[] tex, int[] indices){
+    public static Mesh loadVAO(float[] pos, float[] tex,float[] normals, int[] indices){
         int vao = getVAO();
         int vbo1 = bindIndices(indices);
         int vbo = store(0,3,pos);
         int vbo2 = store(1,2,tex);
+        int vbo3 = store(2,3,normals);
         glBindVertexArray(0);
-        return new Mesh(vao,indices.length,vbo,vbo1,vbo2);
+        //System.out.println(Arrays.toString(pos) + "\nA       A" + Arrays.toString(tex)  + "\nA       A" + Arrays.toString(normals) + "\nA       A" + Arrays.toString(indices));
+        return new Mesh(vao,indices.length,vbo,vbo1,vbo2,vbo3);
     }
 
     private static int getVAO(){
@@ -178,5 +178,18 @@ public class DataLoader {
             vertices.add(aiVertex.z());
         }
         return vertices;
+    }
+
+    private static List<Float> processNormals(AIMesh mesh) {
+        List<Float> normals = new ArrayList<>();
+
+        AIVector3D.Buffer aiNormals = mesh.mNormals();
+        while (aiNormals != null && aiNormals.remaining() > 0) {
+            AIVector3D aiNormal = aiNormals.get();
+            normals.add(aiNormal.x());
+            normals.add(aiNormal.y());
+            normals.add(aiNormal.z());
+        }
+        return normals;
     }
 }

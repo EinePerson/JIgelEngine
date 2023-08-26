@@ -1,8 +1,9 @@
 package de.igelstudios.jigelengine.client;
 
 import de.igelstudios.jigelengine.client.keys.HIDInput;
-import de.igelstudios.jigelengine.client.rendering.Renderer;
-import de.igelstudios.jigelengine.client.rendering.data.ModelCache;
+import de.igelstudios.jigelengine.client.rendering.ObjectRenderer;
+import de.igelstudios.jigelengine.client.rendering.data.RenderCache;
+import de.igelstudios.jigelengine.client.rendering.renderers.Renderer;
 import de.igelstudios.jigelengine.common.engine.Engine;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -14,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 public class ClientEngine extends Engine {
     private final Window window;
     private final HIDInput input;
-    private final Renderer renderer;
+    private final Renderer[] renderers;
 
     //private static GLFont defaultFont = null;
 
@@ -29,14 +30,16 @@ public class ClientEngine extends Engine {
      * @param window the {@link Window} of this engine
      * @param input the {@link HIDInput} of this engine
      */
-    public ClientEngine(Window window, HIDInput input, Renderer renderer, int tps){
+    public ClientEngine(Window window, HIDInput input, int tps, Renderer ... renderers){
         super(tps);
         this.window = window;
         this.input = input;
-        this.renderer = renderer;
+        this.renderers = renderers;
+        renderers[renderers.length - 1].mark();
         GL11.glClearColor(1.0f,1.0f,1.0f,1.0f);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
         //scene = new ClientScene();
-        //addTickable(Renderer.get().getTextBatch());
+        //addTickable(ObjectRenderer.get().getTextBatch());
         //if(defaultFont == null) defaultFont = new GLFont("calibri");
     }
 
@@ -53,7 +56,9 @@ public class ClientEngine extends Engine {
     @Override
     public void loop() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT  | GL11.GL_DEPTH_BUFFER_BIT);
-        renderer.render();
+        for (Renderer renderer : renderers) {
+            renderer.render();
+        }
         GLFW.glfwSwapBuffers(window.getWindow());
         window.pollEvents();
         fps++;
@@ -70,7 +75,7 @@ public class ClientEngine extends Engine {
         //this.initializer.onEnd();
         this.window.close();
         this.input.close();
-        ModelCache.delete();
+        RenderCache.delete();
     }
 
     public int getFPS() {
