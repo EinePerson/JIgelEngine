@@ -20,14 +20,14 @@ jobs:
       - name: Set Up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '20'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Set Up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          graalvm-version: '20.0.1' # Replace with your desired GraalVM version
-          java-version: '20'
+          graalvm-version: '20.0.1'
+          java-version: '17'
 
       - name: Build Native Image
         run: |
