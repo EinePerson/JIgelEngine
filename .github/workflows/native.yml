@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '20'
+          distribution: 'temurin'
 
       - name: Set Up GraalVM
         uses: graalvm/setup-graalvm@v1
